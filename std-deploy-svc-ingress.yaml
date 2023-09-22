@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: std-deployment
+  labels:
+    app.kubernetes.io/name: std-pred
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: std-pred
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: sted-pred
+    spec:
+      containers:
+      - name: std-pred
+        image: ashay1987/std-pred:1.1
+        ports:
+        - containerPort: 4000
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: std-service
+spec:
+  selector:
+    app.kubernetes.io/name: std
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 4000
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: std-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: "/"
+        pathType: Prefix
+        backend:
+          service:
+            name: db-service
+            port:
+             number: 80
+
